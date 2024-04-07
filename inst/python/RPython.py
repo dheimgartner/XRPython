@@ -150,7 +150,7 @@ def store_for_R(obj, this_key, args_from_R):
 
 def del_for_R(key):
     global _for_R
-    if _for_R.has_key(key):
+    if key in _for_R:
         del _for_R[key]
         del_from(recent_keys, key)
         return True
@@ -168,7 +168,7 @@ def del_from(keys, key):
 
 def descr_for_R(key):
     global _for_R
-    if not _for_R.has_key(key):
+    if key not in _for_R:
         return "Not a currently valid key"
     obj = _for_R[key]
     typeName = type(obj).__name__
@@ -181,7 +181,7 @@ def descr_for_R(key):
 
 def pickle_for_R(key, fileName):
     global _for_R
-    if _for_R.has_key(key):
+    if key in _for_R:
         try:
             ff = open(fileName, "a")
         except:
@@ -240,7 +240,7 @@ def proxy_or_object(obj, send, key):
     typeName = type(obj).__name__
     if typeName == 'instance': # old-style class
         typeName = obj.__class__.__name__
-    if send == True or (send is None and scalarTypes.has_key(typeName) ) :
+    if send == True or (send is None and typeName in scalarTypes) :
         return toR(obj, typeName) 
     key = store_for_R(obj, key, [])
     value = copy.copy(proxyForm)
@@ -276,7 +276,7 @@ def toR_dict(obj):
     value = "{ " # in case empty
     okeys = obj.keys()
     for i in range(len(okeys)):
-        keyi = okeys[i]
+        keyi = list(okeys)[i]
         if i > 0:
             value = "{0}, {1} : {2}".format(value, toR(keyi), toR(obj[keyi]))
         else:
@@ -309,10 +309,10 @@ def toR(obj, typename = ""):
         typename = "{0}.{1}".format(module, typename)
     else:
         module = ""
-    if toR_methods.has_key(typename):
+    if typename in toR_methods:
         f = toR_methods[typename]
         return f(obj)
-    if scalarTypes.has_key(typename) or not isClassObject:
+    if typename in scalarTypes or not isClassObject:
         return json.dumps(obj)
     ## return from_Python object
     return toR_class(obj, baseTypename, module)
