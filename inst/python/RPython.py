@@ -185,13 +185,13 @@ def pickle_for_R(key, fileName):
         try:
             ff = open(fileName, "a")
         except:
-            return error_for_R("Can't open file {0} for serializing: {1}".format(fileName, sys.exc_value))
+            return error_for_R("Can't open file {0} for serializing: {1}".format(fileName, sys.exc_info()[1]))
         value = None
         try:
             pickle.dump(_for_R[key], ff)
             ff.close()
         except:
-            value = error_for_R("Error in Python serialize of {0}: {1}".format(key, sys.exc_value))
+            value = error_for_R("Error in Python serialize of {0}: {1}".format(key, sys.exc_info()[1]))
         return value
     return error_for_R("Python key not found for serializing: " + key)
 
@@ -223,7 +223,7 @@ def value_for_R(expr, key, send):
     try:
         code = compile(expr, "from R", comp)
     except:
-        return error_for_R("Compile error in {0} \"{1}\": {2}".format(what, expr, sys.exc_value))
+        return error_for_R("Compile error in {0} \"{1}\": {2}".format(what, expr, sys.exc_info()[1]))
     obj = None
     try:
         if key == "" :
@@ -231,7 +231,7 @@ def value_for_R(expr, key, send):
         else:
             obj = eval(code, _for_R)
     except:
-        return error_for_R("Evaluation error in {0} \"{1}\": {2}".format(what, expr, sys.exc_value))
+        return error_for_R("Evaluation error in {0} \"{1}\": {2}".format(what, expr, sys.exc_info()[1]))
     if key == "":
         return 'null'
     return proxy_or_object(obj, send, key)
